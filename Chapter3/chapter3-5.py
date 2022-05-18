@@ -2,9 +2,10 @@ __author__ = 'Robert W. Curtiss'
 __project__ = 'Fluent Python'
 # 
 # Author: Robert W. Curtiss
-# chapter3-4.py was created on April 21 2022 @ 3:44 PM
+# chapter3-5.py was created on April 22 2022 @ 8:12 AM
 # Project: FluentPython
-#
+# uses set dict.setdefault to fetch and update a list of word
+# occurrences from the index in a single line
 
 import re
 import sys
@@ -19,11 +20,7 @@ if __name__ == '__main__':
                 word = match.group()
                 column_no = match.start() + 1
                 location = (line_no, column_no)
-                # this is ugly
-                occurrences = index.get(word,[]) # look for existing word, if not there return empty list
-                occurrences.append(location) # append line_no and column to the list
-                index[word] = occurrences
+                index.setdefault(word,[]).append(location)
 
     for word in sorted(index,key=str.upper):
         print(word, index[word])
-
