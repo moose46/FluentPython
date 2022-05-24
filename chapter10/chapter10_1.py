@@ -49,7 +49,7 @@ class Order(NamedTuple):  # the context
         return self.total() - discount
 
     def __repr__(self):
-        return f'<Order total: {self.total():.2f} due: {self.due():.2f}'
+        return f'{self.customer.name} <Order total: {self.total():.2f} due: {self.due():.2f} {self.promotion.__repr__()}'
 
 
 class Promotion(ABC):
@@ -66,9 +66,10 @@ class FidelityPromo(Promotion):  # first Concrete Stratgey
         if order.customer.fidelity >= 1000:
             return order.total() * rate
         return Decimal(0)
+    def __repr__(self):
+        return 'Fidelity'
 
-
-class BulkItem(Promotion):
+class BulkItemPromo(Promotion):
     """10% discount for each item with 20 or more units"""
 
     def discount(self, order: Order) -> Decimal:
@@ -77,7 +78,8 @@ class BulkItem(Promotion):
             if item.quantity >= 20:
                 discount += item.total() * Decimal('0.1')
         return discount
-
+    def __repr__(self):
+        return f'Bulk'
 
 class LargeOrderPromo(Promotion):
     """7% discount for orders with 10 or more distinct items"""
@@ -87,17 +89,29 @@ class LargeOrderPromo(Promotion):
         if len(distinct_items) >= 10:
             return order.total() * Decimal('0.07')
         return Decimal(0)
-
+    def __repr__(self):
+        return 'Large Order'
 
 if __name__ == '__main__':
     ann = Customer('Ann Smith', 1100)
     joe = Customer('John Doe', 0)
 
-    cart = (LineItem('banana', 4, Decimal('.5')),
-            LineItem('apple', 10, Decimal('1.5')),
-            LineItem('watermelon', 5, Decimal(5)))
+    cart = (
+        LineItem('banana', 4, Decimal('.5')),
+        LineItem('apple', 10, Decimal('1.5')),
+        LineItem('watermelon', 5, Decimal(5)),
+    )
 
-    print(Order(joe,cart,FidelityPromo()))
-    print(Order(ann,cart,FidelityPromo()))
+    print(Order(joe, cart, FidelityPromo()))
+    print(Order(ann, cart, FidelityPromo()))
 
-    print(f'{joe} / {ann}')
+    # print(f'{joe} / {ann}')
+    banana_cart = (
+        LineItem('banana', 30, Decimal('.5')),
+        LineItem('apple', 10, Decimal(1.5)),
+    )
+
+    print(Order(joe, banana_cart, BulkItemPromo()))
+    long_cart = tuple(LineItem(str(sku), 1, Decimal(1)) for sku in range(10))
+
+    print(Order(joe, long_cart, LargeOrderPromo()))
