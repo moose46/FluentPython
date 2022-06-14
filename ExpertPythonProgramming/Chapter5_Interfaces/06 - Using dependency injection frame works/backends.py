@@ -83,8 +83,6 @@ class SqlLiteMemBackend(ViewsStorageBackend):
 
     def __init__(self):
         try:
-            # self._conn = sqlite3.connect(dbname)
-            # print(f'{dbname} created ok!')
             self._conn = sqlite3.connect('memory.db:cachedb?mode=memory&cache=shared')
             print(f':memory created ok!')
             self._c = self._conn.cursor()

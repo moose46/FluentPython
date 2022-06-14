@@ -15,6 +15,7 @@ from backends import CounterBackend, RedisBackend, SqlLiteBackend, SqlLiteMemBac
 
 
 class CounterModule(Module):
+    '''Counter Module'''
     @provider
     @singleton
     def provide_storage(self) -> ViewsStorageBackend:
