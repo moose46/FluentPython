@@ -8,8 +8,20 @@ __project__ = 'Fluent Python'
 #
 from dataclasses import dataclass
 import itertools
+from zope.interface import Interface, Attribute
+from zope.interface import implementer
+from zope.interface.verify import verifyObject
+
+class ICollidable(Interface):
+    bounding_box = Attribute("Object's bounding box")
 
 
+@dataclass()
+class Point:
+    x: float
+    y: float
+
+@implementer(ICollidable)
 @dataclass()
 class Box:
     x1: float
@@ -17,7 +29,7 @@ class Box:
     x2: float
     y2: float
 
-
+@implementer(ICollidable)
 @dataclass
 class Square:
     x: float
@@ -33,7 +45,7 @@ class Square:
             self.y + self.size
         )
 
-
+@implementer(ICollidable)
 @dataclass
 class Rect:
     x: float
@@ -50,7 +62,7 @@ class Rect:
             self.y + self.height
         )
 
-
+@implementer(ICollidable)
 @dataclass()
 class Circle:
     x: float
@@ -86,6 +98,10 @@ def rects_collide(rect1: Box, rect2: Box):
 
 
 def find_collisions(objects):
+    """https://www.geeksforgeeks.org/python-itertools-combinations-function/"""
+    for item in objects:
+        verifyObject(ICollidable,item)
+
     return [
         (item1, item2) for item1, item2 in itertools.combinations(objects, 2)
         if rects_collide(
@@ -101,7 +117,8 @@ if __name__ == '__main__':
                 Square(0, 0, 10),
                 Rect(5, 5, 20, 20),
                 Square(15, 20, 5),
-                Circle(1, 1, 2)
+                Circle(1, 1, 2),
+                Point(1,1)
             ]
     ):
         print(collision)
